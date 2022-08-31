@@ -6,16 +6,17 @@ export function typeCoverage(program: ts.Program, excludeSpec = false) {
     const checker = program.getTypeChecker();
 
     const result = {
+        aggregatedTypes: {},
         knownTypes: 0,
         numberOfAny: 0,
         percentage: 100,
-        totalTypes: 0,
+        totalTypes: 0
     };
 
     function report(node: ts.Node, message: string) {
         const { line, character } = sourceFileGlobal.getLineAndCharacterOfPosition(node.getStart());
         console.log(
-            chalk.red(`Uknown type found at: ${sourceFileGlobal.fileName} (${line + 1},${character + 1}): ${message}`),
+            chalk.red(`Unknown type found at: ${sourceFileGlobal.fileName} (${line + 1},${character + 1}): ${message}`),
         );
     }
 
@@ -36,7 +37,8 @@ export function typeCoverage(program: ts.Program, excludeSpec = false) {
                     : checker.typeToString(typeObj);
             result.totalTypes++;
             if (type !== 'any') {
-                result.knownTypes++;
+              result.knownTypes++;
+              aggregateTypes(type, result.aggregatedTypes);
             }
             if (type === 'any') {
                 result.numberOfAny++;
@@ -52,7 +54,8 @@ export function typeCoverage(program: ts.Program, excludeSpec = false) {
             if (type) {
                 result.totalTypes++;
                 if (checker.typeToString(type) !== 'any') {
-                    result.knownTypes++;
+                  result.knownTypes++;
+                  aggregateTypes(checker.typeToString(type), result.aggregatedTypes);
                 }
                 if (checker.typeToString(type) === 'any') {
                     result.numberOfAny++;
@@ -117,4 +120,12 @@ export function getProgram(options: ICompilerOptions) {
         program = ts.createProgram(parsed.fileNames, parsed.options, options.tsCompilerHost);
     }
     return program;
+}
+
+function aggregateTypes(type: string, aggregatedTypes: Record<string, number>){
+  if(aggregatedTypes[type]){
+    aggregatedTypes[type]++;
+  } else {
+    aggregatedTypes[type] = 1;
+  }
 }

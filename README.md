@@ -15,8 +15,18 @@ npm run build
 npm link
 ```
 
-To get a report of coverage you can run `typed-report coverage <path/to/your/project/tsconfig.js>`
+To get a report of coverage you can run `typed-report coverage <path/to/your/project/tsconfig.json>`
 
 ```bash
 typed-report coverage tsconfig.json
+```
+
+To exclude spec files from the report 
+```bash
+typed-report coverage -e tsconfig.json
+```
+
+Display top 10 most used types
+```bash
+typed-report coverage -u tsconfig.json
 ```
