@@ -68,7 +68,7 @@ export function typeCoverage(program: ts.Program, excludeSpec = false) {
             !sourceFile.isDeclarationFile &&
             !sourceFile.fileName.includes('/node_module/') &&
             !sourceFile.fileName.includes('/dist/') &&
-            !(excludeSpec && sourceFile.fileName.includes('/.spec.ts/'))
+            !(sourceFile.fileName.includes('.spec.ts') && excludeSpec)
         ) {
             sourceFileGlobal = sourceFile;
             visit(sourceFile);
