@@ -1,7 +1,7 @@
 import chalk from 'chalk';
 import * as ts from 'typescript';
 
-export function typeCoverage(program: ts.Program) {
+export function typeCoverage(program: ts.Program, excludeSpec = false) {
     let sourceFileGlobal: ts.SourceFile;
     const checker = program.getTypeChecker();
 
@@ -67,7 +67,8 @@ export function typeCoverage(program: ts.Program) {
         if (
             !sourceFile.isDeclarationFile &&
             !sourceFile.fileName.includes('/node_module/') &&
-            !sourceFile.fileName.includes('/dist/')
+            !sourceFile.fileName.includes('/dist/') &&
+            !(excludeSpec && sourceFile.fileName.includes('/.spec.ts/'))
         ) {
             sourceFileGlobal = sourceFile;
             visit(sourceFile);
