@@ -7,10 +7,11 @@ export function typeCoverage(program: ts.Program, excludeSpec = false) {
 
     const result = {
         aggregatedTypes: {},
+        badVars: [],
         knownTypes: 0,
         numberOfAny: 0,
         percentage: 100,
-        totalTypes: 0
+        totalTypes: 0,
     };
 
     function report(node: ts.Node, message: string) {
@@ -37,8 +38,8 @@ export function typeCoverage(program: ts.Program, excludeSpec = false) {
                     : checker.typeToString(typeObj);
             result.totalTypes++;
             if (type !== 'any') {
-              result.knownTypes++;
-              aggregateTypes(type, result.aggregatedTypes);
+                result.knownTypes++;
+                aggregateTypes(type, result.aggregatedTypes);
             }
             if (type === 'any') {
                 result.numberOfAny++;
@@ -53,9 +54,10 @@ export function typeCoverage(program: ts.Program, excludeSpec = false) {
             const type = checker.getTypeAtLocation(node);
             if (type) {
                 result.totalTypes++;
+                (result.badVars as string[]).push(node.escapedText as string);
                 if (checker.typeToString(type) !== 'any') {
-                  result.knownTypes++;
-                  aggregateTypes(checker.typeToString(type), result.aggregatedTypes);
+                    result.knownTypes++;
+                    aggregateTypes(checker.typeToString(type), result.aggregatedTypes);
                 }
                 if (checker.typeToString(type) === 'any') {
                     result.numberOfAny++;
@@ -122,10 +124,10 @@ export function getProgram(options: ICompilerOptions) {
     return program;
 }
 
-function aggregateTypes(type: string, aggregatedTypes: Record<string, number>){
-  if(aggregatedTypes[type]){
-    aggregatedTypes[type]++;
-  } else {
-    aggregatedTypes[type] = 1;
-  }
+function aggregateTypes(type: string, aggregatedTypes: Record<string, number>) {
+    if (aggregatedTypes[type]) {
+        aggregatedTypes[type]++;
+    } else {
+        aggregatedTypes[type] = 1;
+    }
 }
